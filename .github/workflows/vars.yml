@@ -34,12 +34,12 @@ jobs:
           echo GITHUB_REF_TYPE  ${GITHUB_REF_TYPE}
           echo VERSION          $VERSION
       - name: 'Print version from tag'
-        if: ${{ GITHUB_REF_TYPE == 'tag' }}
+        if: ${{ eq(GITHUB_REF_TYPE, 'tag') }}
         run: |
           version=GITHUB_REF_NAME
           echo dockerized:$version
       - name: 'Print version with commit'
-        if: ${{ GITHUB_REF_TYPE == 'branch' }}
+        if: ${{ eq(GITHUB_REF_TYPE, 'branch') }}
         run: |
           PROJECT_VERSION=./gradlew properties -q | grep version | awk '{print $2}'
           echo dockerized:$PROJECT_VERSION-$git_hash

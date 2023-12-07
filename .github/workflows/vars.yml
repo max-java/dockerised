@@ -3,6 +3,8 @@ name: Variables and triggers testing
 on:
   push:
     branches: [ "main" ]
+    tags:
+      - 'v*.*.*'
 
 jobs:
 

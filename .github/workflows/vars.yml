@@ -36,10 +36,11 @@ jobs:
       - name: 'Create version'
         run: |
           if [ "$GITHUB_REF_TYPE" == "tag" ]; then
-            version=$GITHUB_REF_NAME
+            echo 'use git tag for image version'
+            echo 'version=$GITHUB_REF_NAME'
           fi
           if [ "$GITHUB_REF_TYPE" == "branch" ]; then
-            git_hash=$(git rev-parse --short "$GITHUB_SHA")
-            version=$VERSION-$git_hash
+            echo 'use application version and git commit for image version'
+            echo 'version=$(./gradlew properties -q | grep version | awk '{print $2}')-$(git rev-parse --short "$GITHUB_SHA")' >> $GITHUB_ENV
           fi
           echo dockerized:$version

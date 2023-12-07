@@ -2,7 +2,7 @@ name: Variables and triggers testing
 
 on:
   push:
-#    branches: [ "main" ]
+    branches: [ "main" ]
     tags:
       - 'v*.*.*'
 
@@ -15,6 +15,15 @@ jobs:
     steps:
       - name: 'Checkout project sources'
         uses: actions/checkout@v3
+      - name: 'Setup java'
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: 'Setup Gradle'
+        uses: gradle/gradle-build-action@v2
+      - name: 'Set Gradle Version'
+        run: echo "VERSION=$(./gradlew properties -q | grep version | awk '{print $2}')" >> $GITHUB_ENV
       - name: 'print variables'
         run: | 
           git_hash=$(git rev-parse --short "$GITHUB_SHA")
@@ -23,3 +32,14 @@ jobs:
           echo git_branch       $git_branch
           echo GITHUB_REF_NAME  ${GITHUB_REF_NAME}
           echo GITHUB_REF_TYPE  ${GITHUB_REF_TYPE}
+          echo VERSION          $VERSION
+      - name: 'Print version from tag'
+        if: ${{ GITHUB_REF_TYPE == 'tag' }}
+        run: |
+          version=GITHUB_REF_NAME
+          echo dockerized:$version
+      - name: 'Print version with commit'
+        if: ${{ GITHUB_REF_TYPE == 'branch' }}
+        run: |
+          PROJECT_VERSION=./gradlew properties -q | grep version | awk '{print $2}'
+          echo dockerized:$PROJECT_VERSION-$git_hash

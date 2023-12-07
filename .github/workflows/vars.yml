@@ -2,7 +2,7 @@ name: Variables and triggers testing
 
 on:
   push:
-    branches: [ "main" ]
+#    branches: [ "main" ]
     tags:
       - 'v*.*.*'
 

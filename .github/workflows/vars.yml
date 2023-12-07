@@ -39,6 +39,7 @@ jobs:
             version=$GITHUB_REF_NAME
           fi
           if [ "$GITHUB_REF_TYPE" == "branch" ]; then
-            version=$PROJECT_VERSION-$git_hash
+            git_hash=$(git rev-parse --short "$GITHUB_SHA")
+            version=$VERSION-$git_hash
           fi
           echo dockerized:$version

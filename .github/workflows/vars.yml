@@ -25,7 +25,7 @@ jobs:
       - name: 'Set Gradle Version'
         run: echo "VERSION=$(./gradlew properties -q | grep version | awk '{print $2}')" >> $GITHUB_ENV
       - name: 'print variables'
-        run: | 
+        run: |
           git_hash=$(git rev-parse --short "$GITHUB_SHA")
           git_branch=${GITHUB_REF#refs/heads/}
           echo git_hash         $git_hash
@@ -34,12 +34,12 @@ jobs:
           echo GITHUB_REF_TYPE  ${GITHUB_REF_TYPE}
           echo VERSION          $VERSION
       - name: 'Print version from tag'
-        if: ${{ eq(GITHUB_REF_TYPE, 'tag') }}
+        if: ${{ evn.GITHUB_REF_TYPE='tag' }}
         run: |
           version=GITHUB_REF_NAME
           echo dockerized:$version
       - name: 'Print version with commit'
-        if: ${{ eq(GITHUB_REF_TYPE, 'branch') }}
+        if: ${{ evn.GITHUB_REF_TYPE='branch') }}
         run: |
           PROJECT_VERSION=./gradlew properties -q | grep version | awk '{print $2}'
           echo dockerized:$PROJECT_VERSION-$git_hash

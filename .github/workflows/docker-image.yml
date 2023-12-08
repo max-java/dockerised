@@ -22,6 +22,28 @@ jobs:
           java-version: 21
       - name: 'Setup Gradle'
         uses: gradle/gradle-build-action@v2
+      - name: 'Set project version from gradle.build'
+        run: echo "GRADLE_VERSION=$(./gradlew properties -q | grep version | awk '{print $2}')" >> $GITHUB_ENV
+      - name: 'Set commit hash'
+        run: echo "GIT_HASH=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_ENV
+      - name: 'Evaluate version'
+        run: |
+          echo GITHUB_REF_NAME  ${GITHUB_REF_NAME}
+          echo GITHUB_REF_TYPE  ${GITHUB_REF_TYPE}
+          echo GRADLE_VERSION   $GRADLE_VERSION
+          echo GIT_HASH         $GIT_HASH       
+          if [ "$GITHUB_REF_TYPE" == "branch" ]; then
+            echo 'use application version from gradle.build file and git hash from commit for image version'
+            echo "VERSION=$GRADLE_VERSION-$GIT_HASH" >> $GITHUB_ENV
+          fi          
+          if [ "$GITHUB_REF_TYPE" == "tag" ]; then
+            if [[ ! "$GITHUB_REF_NAME" =~ ^$GRADLE_VERSION ]]; then
+              echo "::error::Tag '$GITHUB_REF_NAME' does not match project version '$GRADLE_VERSION': version tag should start with project version from gradle.build"
+              exit 1
+            fi
+            echo 'use git tag for image version'
+            echo "VERSION=$GITHUB_REF_NAME" >> $GITHUB_ENV
+          fi
       - name: 'Run build with Gradle Wrapper'
         run: ./gradlew bootJar
       - name: 'Login to GitHub Container Registry'
@@ -32,5 +54,5 @@ jobs:
           password: ${{secrets.GITHUB_TOKEN}}
       - name: 'Build the Docker image'
         run: | 
-          docker build . --file Dockerfile --tag ghcr.io/max-java/dockerized:1.0.0
-          docker push ghcr.io/max-java/dockerized:1.0.0
+          docker build . --file Dockerfile --tag ghcr.io/max-java/dockerized:$VERSION
+          docker push ghcr.io/max-java/dockerized:$VERSION

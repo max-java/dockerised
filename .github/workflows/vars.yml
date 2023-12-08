@@ -39,6 +39,10 @@ jobs:
             echo "VERSION=$GRADLE_VERSION-$GIT_HASH" >> $GITHUB_ENV
           fi          
           if [ "$GITHUB_REF_TYPE" == "tag" ]; then
+            if [[ ! "$GITHUB_REF_NAME" =~ ^$GRADLE_VERSION ]]; then
+              echo "Error: Tag '$GITHUB_REF_NAME' doesn't start with '$GRADLE_VERSION'."
+              exit 1
+            fi
             echo 'use git tag for image version'
             echo "VERSION=$GITHUB_REF_NAME" >> $GITHUB_ENV
           fi

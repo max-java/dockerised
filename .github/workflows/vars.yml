@@ -40,7 +40,7 @@ jobs:
           fi          
           if [ "$GITHUB_REF_TYPE" == "tag" ]; then
             if [[ ! "$GITHUB_REF_NAME" =~ ^$GRADLE_VERSION ]]; then
-              echo "Error: Tag '$GITHUB_REF_NAME' doesn't start with '$GRADLE_VERSION'."
+              echo "::error::Version tag '$GITHUB_REF_NAME' and '$GRADLE_VERSION' are differ: version tag should start with project version from gradle.build"
               exit 1
             fi
             echo 'use git tag for image version'

@@ -34,7 +34,14 @@ jobs:
           echo GIT_HASH         $GIT_HASH
       - name: 'evaluate version'
         run: |
-          echo "VERSION=v.$GRADLE_VERSION-$GIT_HASH" >> $GITHUB_ENV
+          if [ "$GITHUB_REF_TYPE" == "branch" ]; then
+            echo 'use application version from gradle.build file and git hash from commit for image version'
+            echo "VERSION=v.$GRADLE_VERSION-$GIT_HASH" >> $GITHUB_ENV
+          fi          
+          if [ "$GITHUB_REF_TYPE" == "tag" ]; then
+            echo 'use git tag for image version'
+            echo "VERSION=v.$GITHUB_REF_NAME" >> $GITHUB_ENV
+          fi
           echo version is set to $VERSION
       - name: 'print version'
         run: |

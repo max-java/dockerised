@@ -47,6 +47,7 @@ jobs:
           fi
       - name: 'Run build with Gradle Wrapper'
         run: ./gradlew bootJar
+#        todo: this skipping doesn't work.
       - name: 'Skip Docker image building'
         if: ${{ !contains(env.GRADLE_VERSION, 'SNAPSHOT') && env.GITHUB_REF_TYPE == 'branch' }}
         run: |
